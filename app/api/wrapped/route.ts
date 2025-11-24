@@ -544,7 +544,7 @@ export async function GET(request: NextRequest) {
           percentile: rankings.worldPercentile,
           topPercent: Math.max(0.1, 100 - rankings.worldPercentile),
         },
-        country: country
+        country: country && rankings.countryRank && rankings.countryPercentile
           ? {
               name: country,
               rank: rankings.countryRank,
