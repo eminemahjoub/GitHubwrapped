@@ -1,10 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useTheme } from '@/contexts/ThemeContext'
 import InputForm from '@/components/InputForm'
 import SummaryPage from '@/components/SummaryPage'
 import Loader from '@/components/Loader'
 import ErrorDisplay from '@/components/ErrorDisplay'
+import ThemeSelectionScreen from '@/components/ThemeSelectionScreen'
+import ThemeSelector from '@/components/ThemeSelector'
 
 interface User {
   login: string
@@ -59,10 +62,11 @@ interface WrappedData {
   rankings: Rankings
 }
 
-type ViewState = 'input' | 'loading' | 'summary' | 'error'
+type ViewState = 'theme' | 'input' | 'loading' | 'summary' | 'error'
 
 export default function Home() {
-  const [viewState, setViewState] = useState<ViewState>('input')
+  const { themeConfig } = useTheme()
+  const [viewState, setViewState] = useState<ViewState>('theme')
   const [wrappedData, setWrappedData] = useState<WrappedData | null>(null)
   const [errorMessage, setErrorMessage] = useState<string>('')
 
@@ -99,14 +103,35 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">
+    <main 
+      className="min-h-screen transition-all duration-300"
+      style={{
+        background: `linear-gradient(to bottom right, ${themeConfig.colors.background}, ${themeConfig.colors.card})`,
+        color: themeConfig.colors.text,
+      }}
+    >
+      {viewState !== 'theme' && <ThemeSelector />}
+      
+      {viewState === 'theme' && (
+        <ThemeSelectionScreen onContinue={() => setViewState('input')} />
+      )}
+
       {viewState === 'input' && (
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-12">
-            <h1 className="text-6xl font-extrabold mb-4 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+            <h1 
+              className="text-6xl font-extrabold mb-4"
+              style={{ 
+                color: themeConfig.colors.primary,
+                fontFamily: themeConfig.fonts.heading,
+              }}
+            >
               GitHub Wrapped
             </h1>
-            <p className="text-xl text-gray-600">
+            <p 
+              className="text-xl"
+              style={{ color: themeConfig.colors.textSecondary }}
+            >
               Discover your year in code • {new Date().getFullYear()}
             </p>
           </div>

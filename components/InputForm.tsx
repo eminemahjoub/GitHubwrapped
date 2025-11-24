@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface InputFormProps {
   onSubmit: (username: string) => void
@@ -8,6 +9,7 @@ interface InputFormProps {
 }
 
 export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
+  const { themeConfig } = useTheme()
   const [username, setUsername] = useState('')
 
   const handleSubmit = (e: FormEvent) => {
@@ -23,7 +25,8 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
         <div>
           <label
             htmlFor="username"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium mb-2"
+            style={{ color: themeConfig.colors.textSecondary }}
           >
             GitHub Username
           </label>
@@ -33,14 +36,31 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter your GitHub username"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-3 rounded-lg outline-none transition-all"
+            style={{
+              backgroundColor: themeConfig.colors.card,
+              border: `2px solid ${themeConfig.colors.border}`,
+              color: themeConfig.colors.text,
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = themeConfig.colors.primary
+              e.target.style.boxShadow = `0 0 0 3px ${themeConfig.colors.primary}20`
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = themeConfig.colors.border
+              e.target.style.boxShadow = 'none'
+            }}
             disabled={isLoading}
           />
         </div>
         <button
           type="submit"
           disabled={isLoading || !username.trim()}
-          className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+          className="w-full py-3 px-6 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            backgroundColor: themeConfig.colors.primary,
+            color: '#fff',
+          }}
         >
           {isLoading ? 'Loading...' : 'Generate My Wrapped'}
         </button>

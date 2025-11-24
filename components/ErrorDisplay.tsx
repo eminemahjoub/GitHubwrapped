@@ -1,14 +1,27 @@
 'use client'
 
+import { useTheme } from '@/contexts/ThemeContext'
+
 interface ErrorDisplayProps {
   message: string
   onRetry?: () => void
 }
 
 export default function ErrorDisplay({ message, onRetry }: ErrorDisplayProps) {
+  const { themeConfig } = useTheme()
+  
   return (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-      <div className="text-red-600 mb-2">
+    <div 
+      className="rounded-lg p-6 text-center border-2"
+      style={{
+        backgroundColor: themeConfig.colors.card,
+        borderColor: themeConfig.colors.warning,
+      }}
+    >
+      <div 
+        className="mb-2"
+        style={{ color: themeConfig.colors.warning }}
+      >
         <svg
           className="w-12 h-12 mx-auto"
           fill="none"
@@ -23,11 +36,20 @@ export default function ErrorDisplay({ message, onRetry }: ErrorDisplayProps) {
           />
         </svg>
       </div>
-      <p className="text-red-800 font-medium mb-4">{message}</p>
+      <p 
+        className="font-medium mb-4"
+        style={{ color: themeConfig.colors.text }}
+      >
+        {message}
+      </p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          className="px-6 py-2 rounded-lg transition-colors"
+          style={{
+            backgroundColor: themeConfig.colors.warning,
+            color: '#fff',
+          }}
         >
           Try Again
         </button>

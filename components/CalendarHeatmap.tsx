@@ -1,5 +1,7 @@
 'use client'
 
+import { useTheme } from '@/contexts/ThemeContext'
+
 interface ContributionDay {
   date: string
   contributionCount: number
@@ -10,6 +12,8 @@ interface CalendarHeatmapProps {
 }
 
 export default function CalendarHeatmap({ days }: CalendarHeatmapProps) {
+  const { themeConfig } = useTheme()
+  
   // Group days by week
   const weeks: ContributionDay[][] = []
   let currentWeek: ContributionDay[] = []
@@ -32,12 +36,13 @@ export default function CalendarHeatmap({ days }: CalendarHeatmapProps) {
     }
   })
 
-  const getIntensity = (count: number): string => {
-    if (count === 0) return 'bg-gray-100'
-    if (count <= 2) return 'bg-primary-200'
-    if (count <= 5) return 'bg-primary-400'
-    if (count <= 10) return 'bg-primary-600'
-    return 'bg-primary-800'
+  const getIntensityColor = (count: number): string => {
+    if (count === 0) return themeConfig.colors.border
+    const opacity = Math.min(1, count / 20)
+    const r = parseInt(themeConfig.colors.primary.slice(1, 3), 16)
+    const g = parseInt(themeConfig.colors.primary.slice(3, 5), 16)
+    const b = parseInt(themeConfig.colors.primary.slice(5, 7), 16)
+    return `rgba(${r}, ${g}, ${b}, ${0.2 + opacity * 0.8})`
   }
 
   const maxContributions = Math.max(...days.map((d) => d.contributionCount))
@@ -55,9 +60,11 @@ export default function CalendarHeatmap({ days }: CalendarHeatmapProps) {
                 return (
                   <div
                     key={`${weekIndex}-${dayIndex}`}
-                    className={`w-3 h-3 rounded-sm ${getIntensity(
-                      day.contributionCount
-                    )} ${isToday ? 'ring-2 ring-primary-500' : ''}`}
+                    className="w-3 h-3 rounded-sm transition-all hover:scale-125"
+                    style={{
+                      backgroundColor: getIntensityColor(day.contributionCount),
+                      border: isToday ? `2px solid ${themeConfig.colors.primary}` : 'none',
+                    }}
                     title={`${date.toLocaleDateString()}: ${day.contributionCount} contributions`}
                   />
                 )
@@ -65,14 +72,19 @@ export default function CalendarHeatmap({ days }: CalendarHeatmapProps) {
             </div>
           ))}
         </div>
-        <div className="flex items-center justify-between mt-2 text-sm text-gray-600">
+        <div 
+          className="flex items-center justify-between mt-2 text-sm"
+          style={{ color: themeConfig.colors.textSecondary }}
+        >
           <span>Less</span>
           <div className="flex gap-1">
-            <div className="w-3 h-3 rounded-sm bg-gray-100" />
-            <div className="w-3 h-3 rounded-sm bg-primary-200" />
-            <div className="w-3 h-3 rounded-sm bg-primary-400" />
-            <div className="w-3 h-3 rounded-sm bg-primary-600" />
-            <div className="w-3 h-3 rounded-sm bg-primary-800" />
+            {[0, 2, 5, 10, 20].map((count) => (
+              <div
+                key={count}
+                className="w-3 h-3 rounded-sm"
+                style={{ backgroundColor: getIntensityColor(count) }}
+              />
+            ))}
           </div>
           <span>More</span>
         </div>

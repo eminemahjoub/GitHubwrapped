@@ -1,5 +1,7 @@
 'use client'
 
+import { useTheme } from '@/contexts/ThemeContext'
+
 interface StatsCardProps {
   title: string
   value: string | number
@@ -8,15 +10,40 @@ interface StatsCardProps {
 }
 
 export default function StatsCard({ title, value, subtitle, icon }: StatsCardProps) {
+  const { themeConfig } = useTheme()
+  
   return (
-    <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+    <div 
+      className="rounded-xl p-6 shadow-lg hover:shadow-xl transition-all border-2"
+      style={{
+        backgroundColor: themeConfig.colors.card,
+        borderColor: themeConfig.colors.border,
+      }}
+    >
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-medium text-gray-600">{title}</h3>
-        {icon && <div className="text-primary-500">{icon}</div>}
+        <h3 
+          className="text-sm font-medium"
+          style={{ color: themeConfig.colors.textSecondary }}
+        >
+          {title}
+        </h3>
+        {icon && (
+          <div style={{ color: themeConfig.colors.primary }}>{icon}</div>
+        )}
       </div>
-      <p className="text-3xl font-bold text-gray-900">{value}</p>
+      <p 
+        className="text-3xl font-bold"
+        style={{ color: themeConfig.colors.text }}
+      >
+        {value}
+      </p>
       {subtitle && (
-        <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+        <p 
+          className="text-sm mt-1"
+          style={{ color: themeConfig.colors.textSecondary }}
+        >
+          {subtitle}
+        </p>
       )}
     </div>
   )

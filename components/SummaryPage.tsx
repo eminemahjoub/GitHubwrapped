@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import html2canvas from 'html2canvas'
+import { useTheme } from '@/contexts/ThemeContext'
 import CalendarHeatmap from './CalendarHeatmap'
 import StatsCard from './StatsCard'
 import LanguageChart from './LanguageChart'
@@ -19,11 +20,13 @@ interface Rankings {
   world: {
     rank: number
     percentile: number
+    topPercent: number
   }
   country: {
     name: string
     rank: number
     percentile: number
+    topPercent: number
   } | null
 }
 
@@ -67,6 +70,7 @@ export default function SummaryPage({
   rankings,
   onBack,
 }: SummaryPageProps) {
+  const { themeConfig } = useTheme()
   const summaryRef = useRef<HTMLDivElement>(null)
 
   const handleExport = async () => {
@@ -91,55 +95,105 @@ export default function SummaryPage({
   const currentYear = new Date().getFullYear()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 py-8 px-4">
+    <div 
+      className="min-h-screen py-8 px-4 transition-all"
+      style={{
+        background: `linear-gradient(to bottom right, ${themeConfig.colors.background}, ${themeConfig.colors.card})`,
+      }}
+    >
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
           <button
             onClick={onBack}
-            className="text-primary-600 hover:text-primary-700 font-medium"
+            className="font-medium transition-colors hover:opacity-80"
+            style={{ color: themeConfig.colors.primary }}
           >
             ← Back to Search
           </button>
           <button
             onClick={handleExport}
-            className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors shadow-md"
+            className="px-6 py-2 rounded-lg transition-colors shadow-md hover:opacity-90"
+            style={{
+              backgroundColor: themeConfig.colors.primary,
+              color: '#fff',
+            }}
           >
             Export Image
           </button>
         </div>
 
-        <div ref={summaryRef} className="bg-white rounded-2xl shadow-2xl p-8">
+        <div 
+          ref={summaryRef} 
+          className="rounded-2xl shadow-2xl p-8 transition-all"
+          style={{
+            backgroundColor: themeConfig.colors.card,
+            border: `2px solid ${themeConfig.colors.border}`,
+          }}
+        >
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-4">
               <img
                 src={user.avatarUrl}
                 alt={user.login}
-                className="w-20 h-20 rounded-full border-4 border-primary-200"
+                className="w-20 h-20 rounded-full border-4"
+                style={{ borderColor: themeConfig.colors.primary }}
               />
               <div className="text-left">
-                <h1 className="text-4xl font-bold text-gray-900">
+                <h1 
+                  className="text-4xl font-bold"
+                  style={{ color: themeConfig.colors.text }}
+                >
                   {user.name || user.login}
                 </h1>
-                <p className="text-xl text-gray-600">@{user.login}</p>
+                <p 
+                  className="text-xl"
+                  style={{ color: themeConfig.colors.textSecondary }}
+                >
+                  @{user.login}
+                </p>
               </div>
             </div>
-            <h2 className="text-5xl font-extrabold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+            <h2 
+              className="text-5xl font-extrabold"
+              style={{ 
+                color: themeConfig.colors.primary,
+                fontFamily: themeConfig.fonts.heading,
+              }}
+            >
               {currentYear} Year in Code
             </h2>
           </div>
 
           {/* Milestones */}
           <div className="mb-8 space-y-3 text-center">
-            <p className="text-2xl text-gray-700">
-              You made <span className="font-bold text-primary-600">{summary.totalCommits.toLocaleString()}</span> commits
+            <p 
+              className="text-2xl"
+              style={{ color: themeConfig.colors.text }}
+            >
+              You made <span 
+                className="font-bold"
+                style={{ color: themeConfig.colors.primary }}
+              >{summary.totalCommits.toLocaleString()}</span> commits
             </p>
-            <p className="text-2xl text-gray-700">
-              Your longest streak was <span className="font-bold text-primary-600">{summary.longestStreak}</span> days
+            <p 
+              className="text-2xl"
+              style={{ color: themeConfig.colors.text }}
+            >
+              Your longest streak was <span 
+                className="font-bold"
+                style={{ color: themeConfig.colors.primary }}
+              >{summary.longestStreak}</span> days
             </p>
             {summary.currentStreak > 0 && (
-              <p className="text-2xl text-gray-700">
-                You're on a <span className="font-bold text-primary-600">{summary.currentStreak}</span> day streak! 🔥
+              <p 
+                className="text-2xl"
+                style={{ color: themeConfig.colors.text }}
+              >
+                You're on a <span 
+                  className="font-bold"
+                  style={{ color: themeConfig.colors.primary }}
+                >{summary.currentStreak}</span> day streak! {themeConfig.emojis.fire}
               </p>
             )}
           </div>
