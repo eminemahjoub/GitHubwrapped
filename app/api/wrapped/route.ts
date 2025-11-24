@@ -513,7 +513,11 @@ export async function GET(request: NextRequest) {
       contributionsCollection.totalPullRequestReviewContributions
 
     // Calculate rankings based on commits (primary metric)
-    const rankings = calculateRankings(contributionsCollection.totalCommitContributions)
+    const commitCount = contributionsCollection.totalCommitContributions
+    const rankings = calculateRankings(commitCount)
+    
+    // Debug: Log commit count and calculated percentile
+    console.log(`[Ranking] User: ${username}, Commits: ${commitCount}, Percentile: ${rankings.worldPercentile}%`)
 
     const result = {
       user: {
@@ -538,12 +542,14 @@ export async function GET(request: NextRequest) {
         world: {
           rank: rankings.worldRank,
           percentile: rankings.worldPercentile,
+          topPercent: Math.max(0.1, 100 - rankings.worldPercentile),
         },
         country: country
           ? {
               name: country,
               rank: rankings.countryRank,
               percentile: rankings.countryPercentile,
+              topPercent: Math.max(0.1, 100 - rankings.countryPercentile),
             }
           : null,
       },

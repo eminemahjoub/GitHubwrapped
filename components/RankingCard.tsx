@@ -4,10 +4,11 @@ interface RankingCardProps {
   title: string
   rank: number
   percentile: number
+  topPercent?: number
   country?: string
 }
 
-export default function RankingCard({ title, rank, percentile, country }: RankingCardProps) {
+export default function RankingCard({ title, rank, percentile, topPercent, country }: RankingCardProps) {
   const getRankEmoji = (percentile: number) => {
     if (percentile >= 99) return '🏆'
     if (percentile >= 95) return '🥇'
@@ -43,7 +44,10 @@ export default function RankingCard({ title, rank, percentile, country }: Rankin
         <div>
           <p className="text-sm text-gray-600 mb-1">Percentile</p>
           <p className="text-2xl font-bold text-primary-600">
-            Top {percentile}%
+            Top {topPercent ? topPercent.toFixed(1) : (100 - percentile).toFixed(1)}%
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            Better than {percentile.toFixed(1)}% of users
           </p>
         </div>
         {country && (

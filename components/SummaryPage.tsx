@@ -154,12 +154,14 @@ export default function SummaryPage({
                 title="World Ranking"
                 rank={rankings.world.rank}
                 percentile={rankings.world.percentile}
+                topPercent={rankings.world.topPercent}
               />
               {rankings.country && (
                 <RankingCard
                   title="Country Ranking"
                   rank={rankings.country.rank}
                   percentile={rankings.country.percentile}
+                  topPercent={rankings.country.topPercent}
                   country={rankings.country.name}
                 />
               )}

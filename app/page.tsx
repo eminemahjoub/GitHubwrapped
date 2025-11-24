@@ -41,11 +41,13 @@ interface Rankings {
   world: {
     rank: number
     percentile: number
+    topPercent: number
   }
   country: {
     name: string
     rank: number
     percentile: number
+    topPercent: number
   } | null
 }
 
