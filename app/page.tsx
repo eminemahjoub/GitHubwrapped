@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import InputForm from '@/components/InputForm'
 import SummaryPage from '@/components/SummaryPage'
@@ -8,6 +8,7 @@ import Loader from '@/components/Loader'
 import ErrorDisplay from '@/components/ErrorDisplay'
 import ThemeSelectionScreen from '@/components/ThemeSelectionScreen'
 import ThemeSelector from '@/components/ThemeSelector'
+import SearchCounter from '@/components/SearchCounter'
 
 interface User {
   login: string
@@ -74,6 +75,13 @@ export default function Home() {
     setViewState('loading')
     setErrorMessage('')
 
+    // Increment search count
+    try {
+      await fetch('/api/stats', { method: 'POST' })
+    } catch (error) {
+      console.error('Failed to increment search count:', error)
+    }
+
     try {
       const response = await fetch(`/api/wrapped?username=${encodeURIComponent(username)}`)
 
@@ -130,11 +138,14 @@ export default function Home() {
                 GitHub Wrapped
               </h1>
               <p 
-                className="text-xl"
+                className="text-xl mb-4"
                 style={{ color: themeConfig.colors.textSecondary }}
               >
                 Discover your year in code • {new Date().getFullYear()}
               </p>
+              <div className="flex justify-center">
+                <SearchCounter />
+              </div>
             </div>
             <InputForm onSubmit={handleSubmit} isLoading={false} />
           </div>
