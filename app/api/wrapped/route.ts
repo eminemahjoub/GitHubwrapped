@@ -519,6 +519,10 @@ export async function GET(request: NextRequest) {
     // Debug: Log commit count and calculated percentile
     console.log(`[Ranking] User: ${username}, Commits: ${commitCount}, Percentile: ${rankings.worldPercentile}%`)
 
+    // Extract country ranking values with proper type checking
+    const countryRank = rankings.countryRank ?? 0
+    const countryPercentile = rankings.countryPercentile ?? 0
+
     const result = {
       user: {
         login: data.user.login,
@@ -544,12 +548,12 @@ export async function GET(request: NextRequest) {
           percentile: rankings.worldPercentile,
           topPercent: Math.max(0.1, 100 - rankings.worldPercentile),
         },
-        country: country && rankings.countryRank && rankings.countryPercentile
+        country: country && countryRank > 0 && countryPercentile > 0
           ? {
               name: country,
-              rank: rankings.countryRank,
-              percentile: rankings.countryPercentile,
-              topPercent: Math.max(0.1, 100 - rankings.countryPercentile),
+              rank: countryRank,
+              percentile: countryPercentile,
+              topPercent: Math.max(0.1, 100 - countryPercentile),
             }
           : null,
       },
