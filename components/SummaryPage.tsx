@@ -124,30 +124,46 @@ export default function SummaryPage({
 
         <div 
           ref={summaryRef} 
-          className="rounded-2xl shadow-2xl p-8 transition-all"
+          className="rounded-3xl shadow-2xl p-10 transition-all"
           style={{
             backgroundColor: themeConfig.colors.card,
-            border: `2px solid ${themeConfig.colors.border}`,
+            border: `3px solid ${themeConfig.colors.border}`,
+            boxShadow: `0 25px 50px ${themeConfig.colors.primary}15`,
           }}
         >
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <img
-                src={user.avatarUrl}
-                alt={user.login}
-                className="w-20 h-20 rounded-full border-4"
-                style={{ borderColor: themeConfig.colors.primary }}
-              />
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center gap-6 mb-6">
+              <div className="relative">
+                <img
+                  src={user.avatarUrl}
+                  alt={user.login}
+                  className="w-24 h-24 rounded-full border-4 transition-transform hover:scale-110"
+                  style={{ 
+                    borderColor: themeConfig.colors.primary,
+                    boxShadow: `0 0 20px ${themeConfig.colors.primary}40`,
+                  }}
+                />
+                <div 
+                  className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2"
+                  style={{ 
+                    backgroundColor: themeConfig.colors.primary,
+                    borderColor: themeConfig.colors.card,
+                  }}
+                />
+              </div>
               <div className="text-left">
                 <h1 
-                  className="text-4xl font-bold"
-                  style={{ color: themeConfig.colors.text }}
+                  className="text-5xl font-extrabold mb-2"
+                  style={{ 
+                    color: themeConfig.colors.text,
+                    fontFamily: themeConfig.fonts.heading,
+                  }}
                 >
                   {user.name || user.login}
                 </h1>
                 <p 
-                  className="text-xl"
+                  className="text-2xl font-medium"
                   style={{ color: themeConfig.colors.textSecondary }}
                 >
                   @{user.login}
@@ -155,55 +171,99 @@ export default function SummaryPage({
               </div>
             </div>
             <h2 
-              className="text-5xl font-extrabold"
+              className="text-6xl font-extrabold mb-2"
               style={{ 
                 color: themeConfig.colors.primary,
                 fontFamily: themeConfig.fonts.heading,
+                textShadow: `0 0 30px ${themeConfig.colors.primary}30`,
               }}
             >
               {currentYear} Year in Code
             </h2>
+            <div 
+              className="w-24 h-1 mx-auto rounded-full"
+              style={{ backgroundColor: themeConfig.colors.primary }}
+            />
           </div>
 
           {/* Milestones */}
-          <div className="mb-8 space-y-3 text-center">
-            <p 
-              className="text-2xl"
-              style={{ color: themeConfig.colors.text }}
+          <div className="mb-12 space-y-4 text-center">
+            <div 
+              className="inline-block px-8 py-4 rounded-2xl border-2 transition-all hover:scale-105"
+              style={{
+                backgroundColor: `${themeConfig.colors.primary}10`,
+                borderColor: themeConfig.colors.primary,
+              }}
             >
-              You made <span 
-                className="font-bold"
-                style={{ color: themeConfig.colors.primary }}
-              >{summary.totalCommits.toLocaleString()}</span> commits
-            </p>
-            <p 
-              className="text-2xl"
-              style={{ color: themeConfig.colors.text }}
-            >
-              Your longest streak was <span 
-                className="font-bold"
-                style={{ color: themeConfig.colors.primary }}
-              >{summary.longestStreak}</span> days
-            </p>
-            {summary.currentStreak > 0 && (
               <p 
-                className="text-2xl"
+                className="text-3xl font-bold"
                 style={{ color: themeConfig.colors.text }}
               >
-                You're on a <span 
-                  className="font-bold"
-                  style={{ color: themeConfig.colors.primary }}
-                >{summary.currentStreak}</span> day streak! {themeConfig.emojis.fire}
+                You made <span 
+                  className="text-4xl"
+                  style={{ 
+                    color: themeConfig.colors.primary,
+                    textShadow: `0 0 10px ${themeConfig.colors.primary}40`,
+                  }}
+                >{summary.totalCommits.toLocaleString()}</span> commits
               </p>
+            </div>
+            <div 
+              className="inline-block px-8 py-4 rounded-2xl border-2 transition-all hover:scale-105"
+              style={{
+                backgroundColor: `${themeConfig.colors.primary}10`,
+                borderColor: themeConfig.colors.primary,
+              }}
+            >
+              <p 
+                className="text-3xl font-bold"
+                style={{ color: themeConfig.colors.text }}
+              >
+                Your longest streak was <span 
+                  className="text-4xl"
+                  style={{ 
+                    color: themeConfig.colors.primary,
+                    textShadow: `0 0 10px ${themeConfig.colors.primary}40`,
+                  }}
+                >{summary.longestStreak}</span> days
+              </p>
+            </div>
+            {summary.currentStreak > 0 && (
+              <div 
+                className="inline-block px-8 py-4 rounded-2xl border-2 transition-all hover:scale-105 animate-pulse"
+                style={{
+                  backgroundColor: `${themeConfig.colors.accent}20`,
+                  borderColor: themeConfig.colors.accent,
+                }}
+              >
+                <p 
+                  className="text-3xl font-bold"
+                  style={{ color: themeConfig.colors.text }}
+                >
+                  You're on a <span 
+                    className="text-4xl"
+                    style={{ 
+                      color: themeConfig.colors.accent,
+                      textShadow: `0 0 10px ${themeConfig.colors.accent}40`,
+                    }}
+                  >{summary.currentStreak}</span> day streak! {themeConfig.emojis.fire}
+                </p>
+              </div>
             )}
           </div>
 
           {/* Rankings */}
           <div className="mb-8">
-            <h3 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-              Your Rankings 🏆
+            <h3 
+              className="text-4xl font-bold mb-8 text-center"
+              style={{ 
+                color: themeConfig.colors.primary,
+                fontFamily: themeConfig.fonts.heading,
+              }}
+            >
+              Your Rankings {themeConfig.emojis.trophy}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <RankingCard
                 title="World Ranking"
                 rank={rankings.world.rank}
@@ -221,7 +281,10 @@ export default function SummaryPage({
               )}
             </div>
             {!rankings.country && user.location && (
-              <p className="text-center text-gray-500 text-sm mt-4">
+              <p 
+                className="text-center text-sm mt-6"
+                style={{ color: themeConfig.colors.textSecondary }}
+              >
                 💡 Add your location to your GitHub profile to see country rankings
               </p>
             )}

@@ -32,72 +32,55 @@ export default function RankingCard({ title, rank, percentile, topPercent, count
     return rank.toLocaleString()
   }
 
+  const topPercentValue = topPercent ? topPercent.toFixed(1) : (100 - percentile).toFixed(1)
+
   return (
     <div 
-      className="rounded-xl p-6 shadow-lg border-2 transition-all"
+      className="rounded-2xl p-8 shadow-2xl border-2 transition-all hover:scale-105 transform"
       style={{
-        background: `linear-gradient(to bottom right, ${themeConfig.colors.card}, ${themeConfig.colors.background})`,
+        background: `linear-gradient(135deg, ${themeConfig.colors.card} 0%, ${themeConfig.colors.background} 100%)`,
         borderColor: themeConfig.colors.primary,
-        boxShadow: `0 10px 30px ${themeConfig.colors.primary}20`,
+        boxShadow: `0 20px 40px ${themeConfig.colors.primary}30, 0 0 20px ${themeConfig.colors.primary}10`,
       }}
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 
-          className="text-lg font-bold"
-          style={{ color: themeConfig.colors.text }}
-        >
-          {title}
-        </h3>
-        <span className="text-3xl">{getRankEmoji(percentile)}</span>
-      </div>
-      <div className="space-y-2">
-        <div>
-          <p 
-            className="text-sm mb-1"
-            style={{ color: themeConfig.colors.textSecondary }}
+      <div className="text-center">
+        <div className="mb-6">
+          <span className="text-6xl block mb-2">{getRankEmoji(percentile)}</span>
+          <h3 
+            className="text-2xl font-bold mb-2"
+            style={{ color: themeConfig.colors.text }}
           >
-            Rank
-          </p>
-          <p 
-            className="text-3xl font-extrabold"
-            style={{ color: themeConfig.colors.primary }}
-          >
-            #{formatRank(rank)}
-          </p>
-        </div>
-        <div>
-          <p 
-            className="text-sm mb-1"
-            style={{ color: themeConfig.colors.textSecondary }}
-          >
-            Percentile
-          </p>
-          <p 
-            className="text-2xl font-bold"
-            style={{ color: themeConfig.colors.primary }}
-          >
-            Top {topPercent ? topPercent.toFixed(1) : (100 - percentile).toFixed(1)}%
-          </p>
-          <p 
-            className="text-xs mt-1"
-            style={{ color: themeConfig.colors.textSecondary }}
-          >
-            Better than {percentile.toFixed(1)}% of users
-          </p>
-        </div>
-        {country && (
-          <div 
-            className="mt-3 pt-3 border-t"
-            style={{ borderColor: themeConfig.colors.border }}
-          >
+            {title}
+          </h3>
+          {country && (
             <p 
-              className="text-xs"
+              className="text-sm mb-4"
               style={{ color: themeConfig.colors.textSecondary }}
             >
               📍 {country}
             </p>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <p 
+              className="text-6xl font-extrabold mb-2"
+              style={{ 
+                color: themeConfig.colors.primary,
+                textShadow: `0 0 20px ${themeConfig.colors.primary}40`,
+              }}
+            >
+              Top {topPercentValue}%
+            </p>
+            <p 
+              className="text-base font-medium"
+              style={{ color: themeConfig.colors.textSecondary }}
+            >
+              Better than {percentile.toFixed(1)}% of users
+            </p>
           </div>
-        )}
+        </div>
       </div>
     </div>
   )
