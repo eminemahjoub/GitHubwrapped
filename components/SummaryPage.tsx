@@ -359,8 +359,35 @@ export default function SummaryPage({
           )}
 
           {/* Footer */}
-          <div className="text-center text-gray-500 text-sm mt-8 pt-8 border-t border-gray-200">
-            <p>Generated with GitHub Wrapped • {new Date().toLocaleDateString()}</p>
+          <div 
+            className="text-center text-sm mt-8 pt-8 border-t"
+            style={{
+              borderColor: themeConfig.colors.border,
+            }}
+          >
+            <p 
+              className="mb-2"
+              style={{ color: themeConfig.colors.textSecondary }}
+            >
+              Generated with GitHub Wrapped • {new Date().toLocaleDateString()}
+            </p>
+            <p 
+              className="font-medium"
+              style={{ color: themeConfig.colors.textSecondary }}
+            >
+              Created by{' '}
+              <a
+                href="https://github.com/eminemahjoub"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold transition-all hover:underline"
+                style={{ 
+                  color: themeConfig.colors.primary,
+                }}
+              >
+                Amine Mahjoub
+              </a>
+            </p>
           </div>
         </div>
       </div>

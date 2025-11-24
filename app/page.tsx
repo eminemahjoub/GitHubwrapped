@@ -117,25 +117,50 @@ export default function Home() {
       )}
 
       {viewState === 'input' && (
-        <div className="container mx-auto px-4 py-16">
-          <div className="text-center mb-12">
-            <h1 
-              className="text-6xl font-extrabold mb-4"
-              style={{ 
-                color: themeConfig.colors.primary,
-                fontFamily: themeConfig.fonts.heading,
-              }}
-            >
-              GitHub Wrapped
-            </h1>
+        <div className="container mx-auto px-4 py-16 min-h-screen flex flex-col">
+          <div className="flex-grow">
+            <div className="text-center mb-12">
+              <h1 
+                className="text-6xl font-extrabold mb-4"
+                style={{ 
+                  color: themeConfig.colors.primary,
+                  fontFamily: themeConfig.fonts.heading,
+                }}
+              >
+                GitHub Wrapped
+              </h1>
+              <p 
+                className="text-xl"
+                style={{ color: themeConfig.colors.textSecondary }}
+              >
+                Discover your year in code • {new Date().getFullYear()}
+              </p>
+            </div>
+            <InputForm onSubmit={handleSubmit} isLoading={false} />
+          </div>
+          <div 
+            className="text-center text-sm mt-12 pt-6 border-t"
+            style={{
+              borderColor: themeConfig.colors.border,
+            }}
+          >
             <p 
-              className="text-xl"
               style={{ color: themeConfig.colors.textSecondary }}
             >
-              Discover your year in code • {new Date().getFullYear()}
+              Created by{' '}
+              <a
+                href="https://github.com/eminemahjoub"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold transition-all hover:underline"
+                style={{ 
+                  color: themeConfig.colors.primary,
+                }}
+              >
+                Amine Mahjoub
+              </a>
             </p>
           </div>
-          <InputForm onSubmit={handleSubmit} isLoading={false} />
         </div>
       )}
 

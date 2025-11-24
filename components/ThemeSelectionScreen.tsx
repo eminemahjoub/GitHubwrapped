@@ -93,6 +93,30 @@ export default function ThemeSelectionScreen({ onContinue }: ThemeSelectionScree
             Continue with {getTheme(theme).name} Theme →
           </button>
         </div>
+        
+        <div 
+          className="text-center text-sm mt-12 pt-6 border-t animate-fadeIn animate-delay-600"
+          style={{
+            borderColor: getTheme(theme).colors.border,
+          }}
+        >
+          <p 
+            style={{ color: getTheme(theme).colors.textSecondary }}
+          >
+            Created by{' '}
+            <a
+              href="https://github.com/eminemahjoub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold transition-all hover:underline"
+              style={{ 
+                color: getTheme(theme).colors.primary,
+              }}
+            >
+              Amine Mahjoub
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   )
