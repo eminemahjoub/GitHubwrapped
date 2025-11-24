@@ -10,6 +10,8 @@ interface User {
   login: string
   name: string
   avatarUrl: string
+  location?: string | null
+  country?: string | null
 }
 
 interface Summary {
@@ -35,11 +37,24 @@ interface Language {
   percentage: number
 }
 
+interface Rankings {
+  world: {
+    rank: number
+    percentile: number
+  }
+  country: {
+    name: string
+    rank: number
+    percentile: number
+  } | null
+}
+
 interface WrappedData {
   user: User
   summary: Summary
   calendar: ContributionDay[]
   languages: Language[]
+  rankings: Rankings
 }
 
 type ViewState = 'input' | 'loading' | 'summary' | 'error'
@@ -115,6 +130,7 @@ export default function Home() {
           summary={wrappedData.summary}
           calendar={wrappedData.calendar}
           languages={wrappedData.languages}
+          rankings={wrappedData.rankings}
           onBack={handleBack}
         />
       )}

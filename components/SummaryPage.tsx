@@ -5,11 +5,26 @@ import html2canvas from 'html2canvas'
 import CalendarHeatmap from './CalendarHeatmap'
 import StatsCard from './StatsCard'
 import LanguageChart from './LanguageChart'
+import RankingCard from './RankingCard'
 
 interface User {
   login: string
   name: string
   avatarUrl: string
+  location?: string | null
+  country?: string | null
+}
+
+interface Rankings {
+  world: {
+    rank: number
+    percentile: number
+  }
+  country: {
+    name: string
+    rank: number
+    percentile: number
+  } | null
 }
 
 interface Summary {
@@ -40,6 +55,7 @@ interface SummaryPageProps {
   summary: Summary
   calendar: ContributionDay[]
   languages: Language[]
+  rankings: Rankings
   onBack: () => void
 }
 
@@ -48,6 +64,7 @@ export default function SummaryPage({
   summary,
   calendar,
   languages,
+  rankings,
   onBack,
 }: SummaryPageProps) {
   const summaryRef = useRef<HTMLDivElement>(null)
@@ -123,6 +140,33 @@ export default function SummaryPage({
             {summary.currentStreak > 0 && (
               <p className="text-2xl text-gray-700">
                 You're on a <span className="font-bold text-primary-600">{summary.currentStreak}</span> day streak! 🔥
+              </p>
+            )}
+          </div>
+
+          {/* Rankings */}
+          <div className="mb-8">
+            <h3 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+              Your Rankings 🏆
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <RankingCard
+                title="World Ranking"
+                rank={rankings.world.rank}
+                percentile={rankings.world.percentile}
+              />
+              {rankings.country && (
+                <RankingCard
+                  title="Country Ranking"
+                  rank={rankings.country.rank}
+                  percentile={rankings.country.percentile}
+                  country={rankings.country.name}
+                />
+              )}
+            </div>
+            {!rankings.country && user.location && (
+              <p className="text-center text-gray-500 text-sm mt-4">
+                💡 Add your location to your GitHub profile to see country rankings
               </p>
             )}
           </div>

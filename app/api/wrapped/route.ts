@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 const GITHUB_API_URL = 'https://api.github.com/graphql'
+const GITHUB_REST_API_URL = 'https://api.github.com'
 
 interface ContributionDay {
   date: string
@@ -66,6 +67,173 @@ function getCurrentYearDates() {
   const from = `${year}-01-01T00:00:00Z`
   const to = `${year}-12-31T23:59:59Z`
   return { from, to }
+}
+
+async function fetchUserLocation(username: string, token: string): Promise<string | null> {
+  try {
+    const response = await fetch(`${GITHUB_REST_API_URL}/users/${username}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github.v3+json',
+      },
+    })
+
+    if (!response.ok) {
+      return null
+    }
+
+    const userData = await response.json()
+    return userData.location || null
+  } catch (error) {
+    console.error('Error fetching user location:', error)
+    return null
+  }
+}
+
+function extractCountry(location: string | null): string | null {
+  if (!location) return null
+
+  // Common country patterns
+  const countryPatterns: { [key: string]: string } = {
+    'usa': 'United States',
+    'united states': 'United States',
+    'us': 'United States',
+    'uk': 'United Kingdom',
+    'united kingdom': 'United Kingdom',
+    'canada': 'Canada',
+    'germany': 'Germany',
+    'france': 'France',
+    'spain': 'Spain',
+    'italy': 'Italy',
+    'netherlands': 'Netherlands',
+    'belgium': 'Belgium',
+    'sweden': 'Sweden',
+    'norway': 'Norway',
+    'denmark': 'Denmark',
+    'finland': 'Finland',
+    'poland': 'Poland',
+    'portugal': 'Portugal',
+    'greece': 'Greece',
+    'ireland': 'Ireland',
+    'switzerland': 'Switzerland',
+    'austria': 'Austria',
+    'czech republic': 'Czech Republic',
+    'romania': 'Romania',
+    'hungary': 'Hungary',
+    'croatia': 'Croatia',
+    'bulgaria': 'Bulgaria',
+    'slovakia': 'Slovakia',
+    'slovenia': 'Slovenia',
+    'estonia': 'Estonia',
+    'latvia': 'Latvia',
+    'lithuania': 'Lithuania',
+    'japan': 'Japan',
+    'china': 'China',
+    'india': 'India',
+    'south korea': 'South Korea',
+    'singapore': 'Singapore',
+    'malaysia': 'Malaysia',
+    'thailand': 'Thailand',
+    'indonesia': 'Indonesia',
+    'philippines': 'Philippines',
+    'vietnam': 'Vietnam',
+    'australia': 'Australia',
+    'new zealand': 'New Zealand',
+    'brazil': 'Brazil',
+    'argentina': 'Argentina',
+    'chile': 'Chile',
+    'colombia': 'Colombia',
+    'mexico': 'Mexico',
+    'south africa': 'South Africa',
+    'egypt': 'Egypt',
+    'israel': 'Israel',
+    'turkey': 'Turkey',
+    'russia': 'Russia',
+    'ukraine': 'Ukraine',
+    'pakistan': 'Pakistan',
+    'bangladesh': 'Bangladesh',
+    'nigeria': 'Nigeria',
+    'kenya': 'Kenya',
+    'morocco': 'Morocco',
+    'tunisia': 'Tunisia',
+    'algeria': 'Algeria',
+  }
+
+  const locationLower = location.toLowerCase()
+
+  // Try to find country in location string
+  for (const [pattern, country] of Object.entries(countryPatterns)) {
+    if (locationLower.includes(pattern)) {
+      return country
+    }
+  }
+
+  // If no match found, try to extract from common formats like "City, Country"
+  const parts = location.split(',').map((p) => p.trim())
+  if (parts.length > 1) {
+    const lastPart = parts[parts.length - 1].toLowerCase()
+    for (const [pattern, country] of Object.entries(countryPatterns)) {
+      if (lastPart.includes(pattern)) {
+        return country
+      }
+    }
+  }
+
+  return null
+}
+
+function calculateRankings(totalContributions: number): {
+  worldRank: number
+  worldPercentile: number
+  countryRank?: number
+  countryPercentile?: number
+} {
+  // Estimated GitHub user statistics (approximations)
+  // Based on general GitHub usage patterns
+  const estimatedTotalUsers = 100_000_000 // ~100M GitHub users
+  const estimatedActiveUsers = 40_000_000 // ~40M active users per year
+
+  // Contribution distribution estimates (based on typical patterns)
+  // These are rough estimates for ranking calculations
+  const contributionRanges = [
+    { min: 0, max: 50, percentile: 50 }, // Bottom 50%
+    { min: 50, max: 200, percentile: 75 }, // 50-75th percentile
+    { min: 200, max: 500, percentile: 85 }, // 75-85th percentile
+    { min: 500, max: 1000, percentile: 92 }, // 85-92nd percentile
+    { min: 1000, max: 2000, percentile: 96 }, // 92-96th percentile
+    { min: 2000, max: 5000, percentile: 98 }, // 96-98th percentile
+    { min: 5000, max: 10000, percentile: 99 }, // 98-99th percentile
+    { min: 10000, max: Infinity, percentile: 99.9 }, // Top 0.1%
+  ]
+
+  // Calculate world percentile
+  let worldPercentile = 50
+  for (const range of contributionRanges) {
+    if (totalContributions >= range.min && totalContributions < range.max) {
+      worldPercentile = range.percentile
+      break
+    }
+    if (totalContributions >= 10000) {
+      worldPercentile = 99.9
+      break
+    }
+  }
+
+  // Calculate estimated rank (higher percentile = lower rank number = better)
+  const worldRank = Math.ceil((estimatedActiveUsers * (100 - worldPercentile)) / 100)
+
+  // Country rankings are typically 1-2% better than world (more competitive in tech countries)
+  // This is a simplified estimation
+  const countryPercentile = Math.max(0, worldPercentile - 1.5)
+  const estimatedCountryUsers = 1_000_000 // Rough estimate for average country
+  const countryRank = Math.ceil((estimatedCountryUsers * (100 - countryPercentile)) / 100)
+
+  return {
+    worldRank,
+    worldPercentile: Math.round(worldPercentile * 10) / 10,
+    countryRank,
+    countryPercentile: Math.round(countryPercentile * 10) / 10,
+  }
 }
 
 async function fetchGitHubData(username: string, token: string) {
@@ -270,6 +438,10 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Fetch user location
+    const location = await fetchUserLocation(username, token)
+    const country = extractCountry(location)
+
     const { contributionsCollection, repositories } = data.user
 
     // Process contribution days
@@ -303,11 +475,16 @@ export async function GET(request: NextRequest) {
       contributionsCollection.totalPullRequestContributions +
       contributionsCollection.totalPullRequestReviewContributions
 
+    // Calculate rankings
+    const rankings = calculateRankings(totalContributions)
+
     const result = {
       user: {
         login: data.user.login,
         name: data.user.name || data.user.login,
         avatarUrl: data.user.avatarUrl,
+        location: location || null,
+        country: country || null,
       },
       summary: {
         totalContributions,
@@ -319,6 +496,19 @@ export async function GET(request: NextRequest) {
         currentStreak,
         totalStars,
         reposUpdated: reposUpdatedThisYear.length,
+      },
+      rankings: {
+        world: {
+          rank: rankings.worldRank,
+          percentile: rankings.worldPercentile,
+        },
+        country: country
+          ? {
+              name: country,
+              rank: rankings.countryRank,
+              percentile: rankings.countryPercentile,
+            }
+          : null,
       },
       calendar: allDays,
       languages: languages.map((lang) => ({
