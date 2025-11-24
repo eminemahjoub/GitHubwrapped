@@ -25,16 +25,6 @@ interface ContributionsCollection {
   firstPullRequestContribution?: {
     occurredAt: string
   }
-  longestStreak?: {
-    startDate: string
-    endDate: string
-    days: number
-  }
-  currentStreak?: {
-    startDate: string
-    endDate: string
-    days: number
-  }
 }
 
 interface Language {
@@ -102,16 +92,6 @@ async function fetchGitHubData(username: string, token: string) {
             }
           }
           contributionYears
-          longestStreak {
-            startDate
-            endDate
-            days
-          }
-          currentStreak {
-            startDate
-            endDate
-            days
-          }
         }
         repositories(
           first: 100
@@ -209,25 +189,53 @@ function calculateStreaks(contributionDays: ContributionDay[]) {
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   )
 
-  sortedDays.forEach((day, index) => {
-    const dayDate = new Date(day.date)
-    dayDate.setHours(0, 0, 0, 0)
-
+  // Calculate longest streak
+  sortedDays.forEach((day) => {
     if (day.contributionCount > 0) {
       tempStreak++
       longestStreak = Math.max(longestStreak, tempStreak)
-
-      // Check if this is today or yesterday for current streak
-      const daysDiff = Math.floor(
-        (today.getTime() - dayDate.getTime()) / (1000 * 60 * 60 * 24)
-      )
-      if (daysDiff <= 1) {
-        currentStreak = tempStreak
-      }
     } else {
       tempStreak = 0
     }
   })
+
+  // Calculate current streak (from today backwards)
+  tempStreak = 0
+  for (let i = sortedDays.length - 1; i >= 0; i--) {
+    const day = sortedDays[i]
+    const dayDate = new Date(day.date)
+    dayDate.setHours(0, 0, 0, 0)
+    
+    const daysDiff = Math.floor(
+      (today.getTime() - dayDate.getTime()) / (1000 * 60 * 60 * 24)
+    )
+
+    // Only count days up to today
+    if (daysDiff < 0) continue
+
+    if (day.contributionCount > 0) {
+      tempStreak++
+      // If we hit a gap, break
+      if (i > 0) {
+        const prevDay = sortedDays[i - 1]
+        const prevDayDate = new Date(prevDay.date)
+        prevDayDate.setHours(0, 0, 0, 0)
+        const prevDaysDiff = Math.floor(
+          (today.getTime() - prevDayDate.getTime()) / (1000 * 60 * 60 * 24)
+        )
+        // If there's more than 1 day gap, break the streak
+        if (daysDiff - prevDaysDiff > 1) {
+          break
+        }
+      }
+      currentStreak = tempStreak
+    } else {
+      // If today or yesterday has no contributions, break
+      if (daysDiff <= 1) {
+        break
+      }
+    }
+  }
 
   return { longestStreak, currentStreak }
 }
@@ -307,8 +315,8 @@ export async function GET(request: NextRequest) {
         totalIssues: contributionsCollection.totalIssueContributions,
         totalPullRequests: contributionsCollection.totalPullRequestContributions,
         totalReviews: contributionsCollection.totalPullRequestReviewContributions,
-        longestStreak: contributionsCollection.longestStreak?.days || longestStreak,
-        currentStreak: contributionsCollection.currentStreak?.days || currentStreak,
+        longestStreak,
+        currentStreak,
         totalStars,
         reposUpdated: reposUpdatedThisYear.length,
       },
