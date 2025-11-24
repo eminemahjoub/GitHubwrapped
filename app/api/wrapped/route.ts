@@ -212,33 +212,36 @@ function calculateRankings(commits: number): {
   const estimatedActiveUsers = 40_000_000 // ~40M users with contributions this year
 
   // Calculate percentile based on reference model
-  // Using commits as the primary ranking metric
+  // "Top X%" means you're in the top X% of users
+  // Percentile = 100 - X (where X is the "Top X%" value)
+  // Higher percentile = better ranking
   let worldPercentile: number
 
   if (commits >= 5000) {
-    // Top 0.5%: 5000+ commits
+    // Top 0.5%: 5000+ commits → percentile 99.5-100
     worldPercentile = 99.5 + Math.min(0.5, (commits - 5000) / 10000 * 0.5)
   } else if (commits >= 2000) {
-    // Top 1%: 2000-5000 commits
+    // Top 1%: 2000-5000 commits → percentile 99-99.5
     worldPercentile = 99 + ((commits - 2000) / 3000) * 0.5
   } else if (commits >= 1000) {
-    // Top 2%: 1000-2000 commits
+    // Top 2%: 1000-2000 commits → percentile 98-99
     worldPercentile = 98 + ((commits - 1000) / 1000) * 1
   } else if (commits >= 500) {
-    // Top 5%: 500-1000 commits
+    // Top 5%: 500-1000 commits → percentile 95-98
     worldPercentile = 95 + ((commits - 500) / 500) * 3
   } else if (commits >= 200) {
-    // Top 20%: 200-500 commits
+    // Top 20%: 200-500 commits → percentile 80-95
     worldPercentile = 80 + ((commits - 200) / 300) * 15
   } else if (commits >= 50) {
-    // Top 50%: 50-200 commits
+    // Top 50%: 50-200 commits → percentile 50-80
     worldPercentile = 50 + ((commits - 50) / 150) * 30
   } else if (commits > 0) {
-    // Top 80%: 1-50 commits (interpolate between 80-100%)
-    worldPercentile = 80 + (commits / 50) * 20
+    // Top 80%: 1-50 commits → percentile 20-50
+    // "Top 80%" means 80% are below you, so percentile = 20
+    worldPercentile = 20 + ((commits - 1) / 49) * 30
   } else {
-    // Bottom 20%: 0 commits
-    worldPercentile = 20
+    // Bottom 20%: 0 commits → percentile 0-20
+    worldPercentile = 10
   }
 
   // Ensure percentile is within valid range
