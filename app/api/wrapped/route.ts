@@ -183,19 +183,24 @@ function extractCountry(location: string | null): string | null {
 }
 
 /**
- * Calculates user rankings based on contribution statistics
- * Uses a logarithmic distribution model that reflects real-world GitHub contribution patterns
+ * Calculates user rankings based on commit statistics
+ * Uses a reference model based on GitHub commit distribution patterns
  * 
- * Based on research and analysis of GitHub contribution data:
- * - Most users (50-60%) have < 100 contributions per year
- * - Active developers (20-30%) have 100-500 contributions
- * - Very active developers (10-15%) have 500-2000 contributions
- * - Top contributors (5-10%) have 2000+ contributions
+ * Reference thresholds (based on commits/year):
+ * - 5000+ commits = Top 0.5%
+ * - 2000+ commits = Top 1%
+ * - 1000+ commits = Top 2%
+ * - 500+ commits = Top 5%
+ * - 200+ commits = Top 20%
+ * - 50+ commits = Top 50%
+ * - < 50 commits = Top 80%
  * 
- * @param totalContributions - Total contributions (commits + PRs + issues + reviews) for the year
+ * Note: This is an estimation and not backed by any reliable data.
+ * 
+ * @param commits - Number of commits for the year
  * @returns Object containing world and country rankings with percentiles
  */
-function calculateRankings(totalContributions: number): {
+function calculateRankings(commits: number): {
   worldRank: number
   worldPercentile: number
   countryRank?: number
@@ -206,65 +211,48 @@ function calculateRankings(totalContributions: number): {
   const estimatedTotalUsers = 100_000_000 // ~100M total GitHub users
   const estimatedActiveUsers = 40_000_000 // ~40M users with contributions this year
 
-  // Contribution distribution model using logarithmic scaling
-  // This better reflects the long-tail distribution of contributions
-  // where most users have few contributions and few users have many
-  
-  // Calculate percentile using logarithmic interpolation
-  // This provides smoother, more accurate percentile estimates
+  // Calculate percentile based on reference model
+  // Using commits as the primary ranking metric
   let worldPercentile: number
 
-  if (totalContributions === 0) {
-    worldPercentile = 10 // Bottom 10% - users with no contributions
-  } else if (totalContributions < 10) {
-    // 10-30th percentile: Very light contributors
-    worldPercentile = 10 + (totalContributions / 10) * 20
-  } else if (totalContributions < 50) {
-    // 30-50th percentile: Light contributors
-    worldPercentile = 30 + ((totalContributions - 10) / 40) * 20
-  } else if (totalContributions < 100) {
-    // 50-65th percentile: Casual contributors
-    worldPercentile = 50 + ((totalContributions - 50) / 50) * 15
-  } else if (totalContributions < 200) {
-    // 65-75th percentile: Regular contributors
-    worldPercentile = 65 + ((totalContributions - 100) / 100) * 10
-  } else if (totalContributions < 500) {
-    // 75-85th percentile: Active contributors
-    worldPercentile = 75 + ((totalContributions - 200) / 300) * 10
-  } else if (totalContributions < 1000) {
-    // 85-92nd percentile: Very active contributors
-    worldPercentile = 85 + ((totalContributions - 500) / 500) * 7
-  } else if (totalContributions < 2000) {
-    // 92-96th percentile: Highly active contributors
-    worldPercentile = 92 + ((totalContributions - 1000) / 1000) * 4
-  } else if (totalContributions < 5000) {
-    // 96-98th percentile: Top contributors
-    worldPercentile = 96 + ((totalContributions - 2000) / 3000) * 2
-  } else if (totalContributions < 10000) {
-    // 98-99th percentile: Elite contributors
-    worldPercentile = 98 + ((totalContributions - 5000) / 5000) * 1
-  } else if (totalContributions < 20000) {
-    // 99-99.5th percentile: Exceptional contributors
-    worldPercentile = 99 + ((totalContributions - 10000) / 10000) * 0.5
-  } else if (totalContributions < 50000) {
-    // 99.5-99.9th percentile: Outstanding contributors
-    worldPercentile = 99.5 + ((totalContributions - 20000) / 30000) * 0.4
+  if (commits >= 5000) {
+    // Top 0.5%: 5000+ commits
+    worldPercentile = 99.5 + Math.min(0.5, (commits - 5000) / 10000 * 0.5)
+  } else if (commits >= 2000) {
+    // Top 1%: 2000-5000 commits
+    worldPercentile = 99 + ((commits - 2000) / 3000) * 0.5
+  } else if (commits >= 1000) {
+    // Top 2%: 1000-2000 commits
+    worldPercentile = 98 + ((commits - 1000) / 1000) * 1
+  } else if (commits >= 500) {
+    // Top 5%: 500-1000 commits
+    worldPercentile = 95 + ((commits - 500) / 500) * 3
+  } else if (commits >= 200) {
+    // Top 20%: 200-500 commits
+    worldPercentile = 80 + ((commits - 200) / 300) * 15
+  } else if (commits >= 50) {
+    // Top 50%: 50-200 commits
+    worldPercentile = 50 + ((commits - 50) / 150) * 30
+  } else if (commits > 0) {
+    // Top 80%: 1-50 commits (interpolate between 80-100%)
+    worldPercentile = 80 + (commits / 50) * 20
   } else {
-    // Top 0.1%: Legendary contributors
-    worldPercentile = Math.min(99.99, 99.9 + Math.log10(totalContributions / 50000) * 0.09)
+    // Bottom 20%: 0 commits
+    worldPercentile = 20
   }
 
   // Ensure percentile is within valid range
   worldPercentile = Math.max(0, Math.min(100, worldPercentile))
 
   // Calculate estimated rank
-  // Rank = number of users with better (higher) contributions
+  // Rank = number of users with better (higher) commit counts
   // Lower rank number = better position
+  // Top X% means X% of users are below you, so (100 - percentile)% are above
   const worldRank = Math.max(1, Math.ceil((estimatedActiveUsers * (100 - worldPercentile)) / 100))
 
   // Country rankings calculation
   // Assumes country has a subset of active users with similar distribution
-  // Tech-heavy countries may have slightly higher average contributions
+  // Tech-heavy countries may have slightly higher average commits
   const estimatedCountryUsers = 1_000_000 // Average estimate for countries with significant GitHub presence
   
   // Country percentile is typically 0.5-2% better (higher) than world percentile
@@ -521,8 +509,8 @@ export async function GET(request: NextRequest) {
       contributionsCollection.totalPullRequestContributions +
       contributionsCollection.totalPullRequestReviewContributions
 
-    // Calculate rankings
-    const rankings = calculateRankings(totalContributions)
+    // Calculate rankings based on commits (primary metric)
+    const rankings = calculateRankings(contributionsCollection.totalCommitContributions)
 
     const result = {
       user: {
