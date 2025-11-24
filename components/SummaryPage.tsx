@@ -353,7 +353,7 @@ export default function SummaryPage({
 
           {/* Language Chart */}
           {languages.length > 0 && (
-            <div className="mb-8">
+            <div className={`mb-8 ${isVisible ? 'animate-fadeInUp animate-delay-700' : 'opacity-0'}`}>
               <LanguageChart languages={languages} />
             </div>
           )}
