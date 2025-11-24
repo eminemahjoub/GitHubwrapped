@@ -14,7 +14,7 @@ export default function StatsCard({ title, value, subtitle, icon }: StatsCardPro
   
   return (
     <div 
-      className="rounded-xl p-6 shadow-lg hover:shadow-xl transition-all border-2"
+      className="rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 hover:scale-105 hover:-translate-y-2 transform"
       style={{
         backgroundColor: themeConfig.colors.card,
         borderColor: themeConfig.colors.border,
@@ -28,11 +28,11 @@ export default function StatsCard({ title, value, subtitle, icon }: StatsCardPro
           {title}
         </h3>
         {icon && (
-          <div style={{ color: themeConfig.colors.primary }}>{icon}</div>
+          <div className="animate-bounce-slow" style={{ color: themeConfig.colors.primary }}>{icon}</div>
         )}
       </div>
       <p 
-        className="text-3xl font-bold"
+        className="text-3xl font-bold transition-all duration-300 hover:scale-110 inline-block"
         style={{ color: themeConfig.colors.text }}
       >
         {value}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import html2canvas from 'html2canvas'
 import { useTheme } from '@/contexts/ThemeContext'
 import CalendarHeatmap from './CalendarHeatmap'
@@ -72,6 +72,11 @@ export default function SummaryPage({
 }: SummaryPageProps) {
   const { themeConfig } = useTheme()
   const summaryRef = useRef<HTMLDivElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    setIsVisible(true)
+  }, [])
 
   const handleExport = async () => {
     if (!summaryRef.current) return
@@ -124,7 +129,7 @@ export default function SummaryPage({
 
         <div 
           ref={summaryRef} 
-          className="rounded-3xl shadow-2xl p-10 transition-all"
+          className={`rounded-3xl shadow-2xl p-10 transition-all ${isVisible ? 'animate-scaleIn' : 'opacity-0'}`}
           style={{
             backgroundColor: themeConfig.colors.card,
             border: `3px solid ${themeConfig.colors.border}`,
@@ -133,26 +138,26 @@ export default function SummaryPage({
         >
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-6 mb-6">
-              <div className="relative">
+            <div className={`flex items-center justify-center gap-6 mb-6 ${isVisible ? 'animate-fadeInUp' : 'opacity-0'}`}>
+              <div className="relative animate-float">
                 <img
                   src={user.avatarUrl}
                   alt={user.login}
-                  className="w-24 h-24 rounded-full border-4 transition-transform hover:scale-110"
+                  className="w-24 h-24 rounded-full border-4 transition-all duration-300 hover:scale-110 hover:rotate-12"
                   style={{ 
                     borderColor: themeConfig.colors.primary,
                     boxShadow: `0 0 20px ${themeConfig.colors.primary}40`,
                   }}
                 />
                 <div 
-                  className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2"
+                  className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 animate-bounce-slow"
                   style={{ 
                     backgroundColor: themeConfig.colors.primary,
                     borderColor: themeConfig.colors.card,
                   }}
                 />
               </div>
-              <div className="text-left">
+              <div className="text-left animate-slideInRight">
                 <h1 
                   className="text-5xl font-extrabold mb-2"
                   style={{ 
@@ -171,7 +176,7 @@ export default function SummaryPage({
               </div>
             </div>
             <h2 
-              className="text-6xl font-extrabold mb-2"
+              className={`text-6xl font-extrabold mb-2 ${isVisible ? 'animate-fadeInUp animate-delay-200' : 'opacity-0'}`}
               style={{ 
                 color: themeConfig.colors.primary,
                 fontFamily: themeConfig.fonts.heading,
@@ -181,7 +186,7 @@ export default function SummaryPage({
               {currentYear} Year in Code
             </h2>
             <div 
-              className="w-24 h-1 mx-auto rounded-full"
+              className={`w-24 h-1 mx-auto rounded-full ${isVisible ? 'animate-scaleIn animate-delay-300' : 'opacity-0'}`}
               style={{ backgroundColor: themeConfig.colors.primary }}
             />
           </div>
@@ -189,7 +194,7 @@ export default function SummaryPage({
           {/* Milestones */}
           <div className="mb-12 space-y-4 text-center">
             <div 
-              className="inline-block px-8 py-4 rounded-2xl border-2 transition-all hover:scale-105"
+              className={`inline-block px-8 py-4 rounded-2xl border-2 transition-all duration-300 hover:scale-110 hover:shadow-xl ${isVisible ? 'animate-fadeInUp animate-delay-300' : 'opacity-0'}`}
               style={{
                 backgroundColor: `${themeConfig.colors.primary}10`,
                 borderColor: themeConfig.colors.primary,
@@ -200,7 +205,7 @@ export default function SummaryPage({
                 style={{ color: themeConfig.colors.text }}
               >
                 You made <span 
-                  className="text-4xl"
+                  className="text-4xl inline-block animate-bounce-slow"
                   style={{ 
                     color: themeConfig.colors.primary,
                     textShadow: `0 0 10px ${themeConfig.colors.primary}40`,
@@ -209,7 +214,7 @@ export default function SummaryPage({
               </p>
             </div>
             <div 
-              className="inline-block px-8 py-4 rounded-2xl border-2 transition-all hover:scale-105"
+              className={`inline-block px-8 py-4 rounded-2xl border-2 transition-all duration-300 hover:scale-110 hover:shadow-xl ${isVisible ? 'animate-fadeInUp animate-delay-400' : 'opacity-0'}`}
               style={{
                 backgroundColor: `${themeConfig.colors.primary}10`,
                 borderColor: themeConfig.colors.primary,
@@ -220,7 +225,7 @@ export default function SummaryPage({
                 style={{ color: themeConfig.colors.text }}
               >
                 Your longest streak was <span 
-                  className="text-4xl"
+                  className="text-4xl inline-block animate-bounce-slow"
                   style={{ 
                     color: themeConfig.colors.primary,
                     textShadow: `0 0 10px ${themeConfig.colors.primary}40`,
@@ -230,7 +235,7 @@ export default function SummaryPage({
             </div>
             {summary.currentStreak > 0 && (
               <div 
-                className="inline-block px-8 py-4 rounded-2xl border-2 transition-all hover:scale-105 animate-pulse"
+                className={`inline-block px-8 py-4 rounded-2xl border-2 transition-all duration-300 hover:scale-110 hover:shadow-xl animate-pulse ${isVisible ? 'animate-fadeInUp animate-delay-500' : 'opacity-0'}`}
                 style={{
                   backgroundColor: `${themeConfig.colors.accent}20`,
                   borderColor: themeConfig.colors.accent,
@@ -241,7 +246,7 @@ export default function SummaryPage({
                   style={{ color: themeConfig.colors.text }}
                 >
                   You're on a <span 
-                    className="text-4xl"
+                    className="text-4xl inline-block animate-bounce-slow"
                     style={{ 
                       color: themeConfig.colors.accent,
                       textShadow: `0 0 10px ${themeConfig.colors.accent}40`,
@@ -255,7 +260,7 @@ export default function SummaryPage({
           {/* Rankings */}
           <div className="mb-8">
             <h3 
-              className="text-4xl font-bold mb-8 text-center"
+              className={`text-4xl font-bold mb-8 text-center ${isVisible ? 'animate-fadeInUp animate-delay-400' : 'opacity-0'}`}
               style={{ 
                 color: themeConfig.colors.primary,
                 fontFamily: themeConfig.fonts.heading,
@@ -264,20 +269,24 @@ export default function SummaryPage({
               Your Rankings {themeConfig.emojis.trophy}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <RankingCard
-                title="World Ranking"
-                rank={rankings.world.rank}
-                percentile={rankings.world.percentile}
-                topPercent={rankings.world.topPercent}
-              />
-              {rankings.country && (
+              <div className={isVisible ? 'animate-slideInLeft animate-delay-500' : 'opacity-0'}>
                 <RankingCard
-                  title="Country Ranking"
-                  rank={rankings.country.rank}
-                  percentile={rankings.country.percentile}
-                  topPercent={rankings.country.topPercent}
-                  country={rankings.country.name}
+                  title="World Ranking"
+                  rank={rankings.world.rank}
+                  percentile={rankings.world.percentile}
+                  topPercent={rankings.world.topPercent}
                 />
+              </div>
+              {rankings.country && (
+                <div className={isVisible ? 'animate-slideInRight animate-delay-500' : 'opacity-0'}>
+                  <RankingCard
+                    title="Country Ranking"
+                    rank={rankings.country.rank}
+                    percentile={rankings.country.percentile}
+                    topPercent={rankings.country.topPercent}
+                    country={rankings.country.name}
+                  />
+                </div>
               )}
             </div>
             {!rankings.country && user.location && (
@@ -291,7 +300,7 @@ export default function SummaryPage({
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 ${isVisible ? 'animate-fadeIn animate-delay-600' : 'opacity-0'}`}>
             <StatsCard
               title="Total Contributions"
               value={summary.totalContributions.toLocaleString()}

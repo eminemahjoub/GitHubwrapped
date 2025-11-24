@@ -36,7 +36,7 @@ export default function RankingCard({ title, rank, percentile, topPercent, count
 
   return (
     <div 
-      className="rounded-2xl p-8 shadow-2xl border-2 transition-all hover:scale-105 transform"
+      className="rounded-2xl p-8 shadow-2xl border-2 transition-all duration-300 hover:scale-110 hover:shadow-2xl transform"
       style={{
         background: `linear-gradient(135deg, ${themeConfig.colors.card} 0%, ${themeConfig.colors.background} 100%)`,
         borderColor: themeConfig.colors.primary,
@@ -45,7 +45,7 @@ export default function RankingCard({ title, rank, percentile, topPercent, count
     >
       <div className="text-center">
         <div className="mb-6">
-          <span className="text-6xl block mb-2">{getRankEmoji(percentile)}</span>
+          <span className="text-6xl block mb-2 animate-float">{getRankEmoji(percentile)}</span>
           <h3 
             className="text-2xl font-bold mb-2"
             style={{ color: themeConfig.colors.text }}
@@ -65,7 +65,7 @@ export default function RankingCard({ title, rank, percentile, topPercent, count
         <div className="space-y-4">
           <div>
             <p 
-              className="text-6xl font-extrabold mb-2"
+              className="text-6xl font-extrabold mb-2 animate-bounce-slow"
               style={{ 
                 color: themeConfig.colors.primary,
                 textShadow: `0 0 20px ${themeConfig.colors.primary}40`,
